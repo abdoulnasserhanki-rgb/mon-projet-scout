@@ -1,0 +1,249 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-edit me-2 text-primary"></i>
+                Modifier l'Utilisateur
+            </h1>
+            <p class="text-muted mb-0">Modifier les informations de {{ user_obj.get_full_name|default:user_obj.username }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- User Info Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-user fa-2x text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h5 class="card-title">{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+                        <p class="card-text">
+                            <span class="badge 
+                                {% if user_obj.role == 'ADMIN' %}badge-admin
+                                {% elif user_obj.role == 'CHEF_UNITE' %}badge-chef-unite
+                                {% elif user_obj.role == 'CHEF_GROUPE' %}badge-chef-groupe
+                                {% else %}badge-membre{% endif %} me-2">
+                                {{ user_obj.get_role_display }}
+                            </span>
+                            <span class="badge {% if user_obj.is_active %}bg-success{% else %}bg-danger{% endif %} me-2">
+                                {% if user_obj.is_active %}Actif{% else %}Inactif{% endif %}
+                            </span>
+                            <small class="text-muted">Créé le {{ user_obj.date_joined|date:"d/m/Y" }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Form -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-cog me-2 text-primary"></i>
+                    Informations de l'Utilisateur
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Username -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                Nom d'utilisateur <span class="text-danger">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                Email <span class="text-danger">*</span>
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- First Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                Unité de Ratachement
+                            </label>
+                            {{ form.unite }}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                Branche
+                            </label>
+                            {{ form.section }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Role -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.role.id_for_label }}" class="form-label">
+                                Rôle <span class="text-danger">*</span>
+                            </label>
+                            {{ form.role }}
+                            {% if form.role.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.role.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Définit les permissions de l'utilisateur dans le système
+                            </div>
+                        </div>
+
+                        <!-- Telephone -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telephone.id_for_label }}" class="form-label">
+                                Téléphone
+                            </label>
+                            {{ form.telephone }}
+                        </div>
+                    </div>
+
+                    <!-- Active Status -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Compte actif
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Si désactivé, l'utilisateur ne pourra plus se connecter
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning for role changes -->
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Attention lors du changement de rôle
+                        </h6>
+                        <p class="mb-0">
+                            Le changement de rôle affecte immédiatement les permissions de l'utilisateur. 
+                            Assurez-vous que le nouveau rôle correspond aux responsabilités de l'utilisateur.
+                        </p>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions mt-4 pt-3 border-top">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Annuler
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Enregistrer les modifications
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-admin { background-color: #e74c3c; }
+    .badge-chef-unite { background-color: #3498db; }
+    .badge-chef-groupe { background-color: #f39c12; }
+    .badge-membre { background-color: #27ae60; }
+    
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px 12px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .form-actions {
+        background-color: #f8f9fa;
+        margin: 0 -25px -25px;
+        padding: 25px;
+        border-radius: 0 0 10px 10px;
+    }
+</style>
+
+<script>
+    // Confirmation pour les changements de rôle
+    const roleSelect = document.getElementById('{{ form.role.id_for_label }}');
+    const originalRole = roleSelect.value;
+    
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const newRole = roleSelect.value;
+        
+        if (newRole !== originalRole) {
+            const roleNames = {
+                'ADMIN': 'Administrateur',
+                'CHEF_UNITE': 'Chef d\'Unité', 
+                'CHEF_GROUPE': 'Chef de Groupe',
+                'CHEF_SECTION': 'Chef de Section'
+            };
+            
+            if (!confirm(
+                `Êtes-vous sûr de vouloir changer le rôle de "${roleNames[originalRole]}" à "${roleNames[newRole]}" ?\n\n` +
+                `Cette modification affectera immédiatement les permissions de l'utilisateur.`
+            )) {
+                e.preventDefault();
+            }
+        }
+    });
+</script>
+{% endblock %}

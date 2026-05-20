@@ -1,0 +1,68 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-tasks me-2 text-primary"></i>
+                Préinscriptions en attente
+            </h1>
+            <p class="text-muted mb-0">Validez ou refusez les demandes de préinscription soumises par les adhérents.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'preinscription_create' %}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Nouvelle préinscription
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if preinscriptions %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Date de naissance</th>
+                                <th>Unité</th>
+                                <th>Téléphone</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pre in preinscriptions %}
+                            <tr>
+                                <td>{{ pre.nom }}</td>
+                                <td>{{ pre.prenom }}</td>
+                                <td>{{ pre.date_naissance }}</td>
+                                <td>{{ pre.unite }}</td>
+                                <td>{{ pre.numero|default:'-' }}</td>
+                                <td>{{ pre.created_at|date:'d/m/Y H:i' }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'preinscription_approve' pre.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check me-1"></i>Valider
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="alert alert-info">Aucune préinscription en attente pour le moment.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

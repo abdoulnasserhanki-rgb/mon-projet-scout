@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maitrise Groupe Tegama</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            position: fixed;
+            width: 280px;
+            transition: all 0.3s;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding-left: 30px;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #e74c3c;
+            color: white;
+            border-left: 4px solid #fff;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            transition: all 0.3s;
+            overflow-x: hidden;
+        }
+
+        .user-info {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .user-role-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: transform 0.3s;
+            height: 100%;
+            margin-bottom: 20px;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .adherant-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: all 0.3s;
+            text-align: center;
+            height: 100%;
+            margin-bottom: 20px;
+        }
+
+        .adherant-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .adherant-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+            margin: 0 auto 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 15px;
+            left: 295px;
+            z-index: 1001;
+            background: #3498db;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .sidebar-collapsed .sidebar {
+            width: 70px;
+        }
+
+        .sidebar-collapsed .main-content {
+            margin-left: 70px;
+        }
+
+        .sidebar-collapsed .sidebar-toggle {
+            left: 85px;
+        }
+
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-collapsed .user-info .user-details {
+            display: none;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .quick-actions .btn {
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .quick-actions .btn i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .quick-actions .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments */
+        /* === CORRECTIONS RESPONSIVE === */
+
+        /* Bouton burger mobile */
+        .mobile-menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            width: 45px;
+            height: 45px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cache le bouton toggle original sur mobile */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                padding-top: 70px;
+                /* Espace pour le bouton burger */
+            }
+
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: 3px 0 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            /* Overlay sombre quand le menu est ouvert */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+
+        /* Masquer le bouton burger sur desktop */
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Ajustements pour très petits écrans */
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .user-info {
+                padding: 20px 15px;
+            }
+
+            .user-info img,
+            .user-info i.fa-user-circle {
+                width: 60px !important;
+                height: 60px !important;
+            }
+        }
+
+        /* Garder la version repliée fonctionnelle sur desktop */
+        @media (min-width: 769px) {
+            .sidebar-collapsed .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-collapsed .main-content {
+                margin-left: 70px;
+            }
+
+            .sidebar-collapsed .sidebar-toggle {
+                left: 85px;
+            }
+        }
+
+        /* Badge colors for roles */
+        .badge-admin {
+            background-color: #e74c3c;
+        }
+
+        .badge-chef-unite {
+            background-color: #3498db;
+        }
+
+        .badge-chef-groupe {
+            background-color: #f39c12;
+        }
+
+        .badge-membre {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar">
+                <!-- User Info Section -->
+                <div class="user-info">
+                    {% if user.photo_profil %}
+                    <img src="{{ user.photo_profil.url }}" alt="Photo de profil" class="rounded-circle img-thumbnail"
+                        style="width: 70px; height: 70px;">
+                    {% else %}
+                    <i class="fas fa-user-circle fa-3x mb-3"></i>
+                    {% endif %}
+                    <div class="user-details">
+                        <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                        <span class="user-role-badge badge 
+                            {% if user.role == 'ADMIN' %}badge-admin
+                            {% elif user.role == 'CHEF_UNITE' %}badge-chef-unite
+                            {% elif user.role == 'CHEF_GROUPE' %}badge-chef-groupe
+                            {% else %}badge-membre{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                        <small class="text-light d-block mt-1">{{ user.email }}</small>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}"
+                            href="{% url 'accueil' %}">
+                            <i class="fas fa-tachometer-alt me-3"></i>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'adherant' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'adherant_list' %}">
+                            <i class="fas fa-users me-3"></i>
+                            <span>Gestion Adhérents</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'preinscription_list' %}active{% endif %}"
+                            href="{% url 'preinscription_list' %}">
+                            <i class="fas fa-hourglass-half me-3"></i>
+                            <span>Préinscriptions en attente</span>
+                        </a>
+                    </li>
+
+                    <!-- Gestion des Utilisateurs (Visible seulement pour les admins et le chef de groupe) -->
+                    {% if user.role == 'ADMIN' or user.role == 'CHEF_GROUPE' %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'user_list' %}">
+                            <i class="fas fa-user-shield me-3"></i>
+                            <span>Gestion Utilisateurs</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'user_profile' %}">
+                            <i class="fas fa-user-circle me-3"></i>
+                            <span>Mon Profil</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item mt-4">
+                        <a class="nav-link text-warning" href="{% url 'logout' %}"
+                            onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?');">
+                            <i class="fas fa-sign-out-alt me-3"></i>
+                            <span>Déconnexion</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Overlay pour fermer le menu sur mobile -->
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+            <!-- Main Content -->
+            <!-- Bouton burger mobile -->
+            <button class="mobile-menu-toggle d-lg-none" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <main class="main-content">
+                <div class="container" th:replace="${mainContent}">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Éléments DOM
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const body = document.body;
+
+        // Toggle sidebar desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function () {
+                body.classList.toggle('sidebar-collapsed');
+            });
+        }
+
+        // Toggle sidebar mobile
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+            });
+        }
+
+        // Fermer sidebar avec overlay
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function () {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            });
+        }
+
+        // Fermer sidebar en cliquant sur un lien (mobile)
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                }
+            });
+        });
+
+        // Animation pour les cartes au chargement
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.stats-card, .adherant-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(15px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 80);
+            });
+
+            // Initialiser l'état mobile
+            handleMobileSidebar();
+        });
+
+        // Gestion responsive
+        function handleMobileSidebar() {
+            if (window.innerWidth < 768) {
+                // Sur mobile, cacher la sidebar par défaut
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            } else {
+                // Sur desktop, montrer la sidebar
+                sidebar.classList.add('show');
+            }
+        }
+
+        window.addEventListener('resize', handleMobileSidebar);
+    </script>
+</body>
+
+</html>

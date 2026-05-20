@@ -1,0 +1,186 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-user-edit me-2 text-primary"></i>
+                Modifier mon Profil
+            </h1>
+            <p class="text-muted mb-0">Mettez à jour vos informations personnelles</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'user_profile' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour au profil
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Photo de profil -->
+                        <div class="col-md-4 mb-4">
+                            <div class="text-center">
+                                {% if user.photo_profil %}
+                                    <img src="{{ user.photo_profil.url }}" 
+                                         alt="Photo actuelle" 
+                                         class="rounded-circle img-thumbnail mb-3"
+                                         style="width: 150px; height: 150px; object-fit: cover;"
+                                         id="currentPhoto">
+                                {% else %}
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3"
+                                         style="width: 150px; height: 150px;"
+                                         id="currentPhotoPlaceholder">
+                                        <i class="fas fa-user fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <label for="{{ form.photo_profil.id_for_label }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-camera me-2"></i>
+                                    Changer la photo
+                                </label>
+                                {{ form.photo_profil }}
+                                
+                                <div class="form-text small mt-2">
+                                    Formats: JPG, PNG, GIF<br>
+                                    Max: 2MB
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Informations -->
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.telephone.id_for_label }}" class="form-label">
+                                        Téléphone
+                                    </label>
+                                    {{ form.telephone }}
+                                    {% if form.telephone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.telephone.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations non modifiables -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Informations système</h6>
+                                    <small>
+                                        <strong>Nom d'utilisateur:</strong> {{ user.username }}<br>
+                                        <strong>Rôle:</strong> {{ user.get_role_display }}<br>
+                                        <strong>Membre depuis:</strong> {{ user.date_joined|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions mt-4 pt-3 border-top">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{% url 'user_profile' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Annuler
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Enregistrer les modifications
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px 12px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .form-actions {
+        background-color: #f8f9fa;
+        margin: 0 -25px -25px;
+        padding: 25px;
+        border-radius: 0 0 10px 10px;
+    }
+</style>
+
+<script>
+    // Aperçu de la photo sélectionnée
+    document.getElementById('{{ form.photo_profil.id_for_label }}').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Créer ou mettre à jour l'image
+                let img = document.getElementById('currentPhoto');
+                const placeholder = document.getElementById('currentPhotoPlaceholder');
+                
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+                
+                if (!img) {
+                    img = document.createElement('img');
+                    img.id = 'currentPhoto';
+                    img.className = 'rounded-circle img-thumbnail mb-3';
+                    img.style.width = '150px';
+                    img.style.height = '150px';
+                    img.style.objectFit = 'cover';
+                    
+                    const container = document.querySelector('.text-center');
+                    container.insertBefore(img, document.querySelector('label'));
+                }
+                
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,603 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-user me-2 text-primary"></i>
+                Profil Adhérent
+            </h1>
+            <p class="text-muted mb-0">Aperçu général et gestion de l'adhérent</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            {% if can_edit %}
+            <button class="btn btn-warning" id="editAdherantBtn">
+                <i class="fas fa-edit me-2"></i>
+                Modifier le Profil
+            </button>
+            {% endif %}
+            <a href="{% url 'adherant_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Overview -->
+<div class="row">
+    <!-- Left Column - Profile Information -->
+    <div class="col-lg-4 col-md-5">
+        <!-- Profile Card -->
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="position-relative d-inline-block mb-3">
+                    {% if adherant.photo %}
+                    <img src="{{ adherant.photo.url }}" alt="Photo de {{ adherant.prenom }} {{ adherant.nom }}"
+                        class="rounded-circle profile-photo-lg border">
+                    {% else %}
+                    <div
+                        class="rounded-circle profile-photo-lg border bg-light d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-muted fa-3x"></i>
+                    </div>
+                    {% endif %}
+                    <span
+                        class="position-absolute bottom-0 end-0 badge {% if adherant.sexe == 'M' %}bg-primary{% else %}bg-pink{% endif %} rounded-circle p-2"
+                        title="{% if adherant.sexe == 'M' %}Masculin{% else %}Féminin{% endif %}">
+                        <i class="fas fa-{% if adherant.sexe == 'M' %}male{% else %}female{% endif %}"></i>
+                    </span>
+                </div>
+
+                <h4 class="mb-1">{{ adherant.prenom }} {{ adherant.nom }}</h4>
+                <p class="text-muted mb-2">Numéro: {{ adherant.numero }}</p>
+
+                <div class="badge-container mb-3">
+                    <span class="badge bg-primary me-1">
+                        <i class="fas fa-building me-1"></i>
+                        {{ adherant.unite }}
+                    </span>
+                    <span
+                        class="badge {% if adherant.branche == 'Louveteau' %}bg-warning{% elif adherant.branche == 'Éclaireur' %}bg-danger{% elif adherant.branche == 'Cheminot' %}bg-purple{% else %}bg-info{% endif %} me-1">
+                        {{ branche }}
+                    </span>
+                    <span
+                        class="badge {% if adherant.situation == 'actif' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ adherant.situation|title }}
+                    </span>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row text-center mt-4">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h5 class="mb-1 text-primary">{{ age }}</h5>
+                            <small class="text-muted">Âge</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h5 class="mb-1 text-success">{{ duree_adhesion }}</h5>
+                            <small class="text-muted">Mois d'adhésion</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="mb-1 text-info">{{ adherant.niveau_etude|truncatechars:10 }}</h5>
+                        <small class="text-muted">Niveau étude</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-address-card me-2 text-primary"></i>
+                    Informations de Contact
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="info-item mb-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-home text-muted me-3"></i>
+                        <div>
+                            <small class="text-muted d-block">Résidence</small>
+                            <span class="text-dark">{{ adherant.residence }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item mb-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-phone text-muted me-3"></i>
+                        <div>
+                            <small class="text-muted d-block">Numéro personnel</small>
+                            <span class="text-dark">{{ adherant.numero }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% if adherant.numero_parent %}
+                <div class="info-item">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-users text-muted me-3"></i>
+                        <div>
+                            <small class="text-muted d-block">Numéro parent</small>
+                            <span class="text-dark">{{ adherant.numero_parent }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Competences -->
+        {% if adherant.competences %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-star me-2 text-warning"></i>
+                    Compétences
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="competences-tags">
+                    {% for competence in competences_list %}
+                    <span class="badge bg-light text-dark mb-2 me-1">{{ competences_list }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column - Details and Information -->
+    <div class="col-lg-8 col-md-7">
+        <!-- Personal Details Card -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Informations Personnelles
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Nom complet</small>
+                            <span class="text-dark">{{ adherant.nom }} {{ adherant.prenom }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Date de naissance</small>
+                            <span class="text-dark">{{ adherant.date_naissance|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Lieu de naissance</small>
+                            <span class="text-dark">{{ adherant.lieu_naissance }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Sexe</small>
+                            <span class="text-dark">{{ adherant.get_sexe_display }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Situation matrimoniale</small>
+                            <span class="text-dark">{{ adherant.situation_matrimoniale }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Niveau d'étude</small>
+                            <span class="text-dark">{{ adherant.niveau_etude }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Religion</small>
+                            <span class="text-dark">{{ adherant.religion }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Âge</small>
+                            <span class="text-dark">{{ age }} ans</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scout Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-scroll me-2 text-success"></i>
+                    Informations Scoutes
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Unité</small>
+                            <span class="text-dark">{{ adherant.unite }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Branche</small>
+                            <span
+                                class="badge {% if adherant.branche == 'Louveteau' %}bg-warning{% elif adherant.branche == 'Éclaireur' %}bg-danger{% elif adherant.branche == 'Cheminot' %}bg-purple{% else %}bg-info{% endif %}">
+                                {{ branche }}
+                            </span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Date d'intégration</small>
+                            <span class="text-dark">{{ adherant.date_integration|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Situation</small>
+                            <span
+                                class="badge {% if adherant.situation == 'actif' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ adherant.situation|title }}
+                            </span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Motif d'adhésion</small>
+                            <span class="text-dark">{{ adherant.motif }}</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Motivation</small>
+                            <span class="text-dark">{{ adherant.motivation }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-database me-2 text-info"></i>
+                    Informations Système
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Date de création</small>
+                            <span class="text-dark">{{ adherant.date_creation|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Durée d'adhésion</small>
+                            <span class="text-dark">{{ duree_adhesion }} mois</span>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <small class="text-muted d-block">Statut</small>
+                            <span class="badge {% if est_nouveau %}bg-success{% else %}bg-primary{% endif %}">
+                                {% if est_nouveau %}Nouvel adhérent{% else %}Membre depuis {{
+                                adherant.date_integration|date:"d/m/Y" }} {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        {% if can_edit %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2 text-warning"></i>
+                    Actions Rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                   
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-success w-100 mb-2" onclick="printProfile()">
+                            <i class="fas fa-print me-2"></i>
+                            Imprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Edit Adherant Modal -->
+{% if can_edit %}
+<div class="modal fade" id="editAdherantModal" tabindex="-1" aria-labelledby="editAdherantModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAdherantModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Modifier l'Adhérent
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Informations personnelles</h6>
+
+                            <div class="mb-3">
+                                <label for="{{ form.nom.id_for_label }}" class="form-label">Nom *</label>
+                                {{ form.nom }}
+                                {% if form.nom.errors %}
+                                <div class="text-danger small">{{ form.nom.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.prenom.id_for_label }}" class="form-label">Prénom *</label>
+                                {{ form.prenom }}
+                                {% if form.prenom.errors %}
+                                <div class="text-danger small">{{ form.prenom.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.date_naissance.id_for_label }}" class="form-label">Date de naissance
+                                    *</label>
+                                {{ form.date_naissance }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.lieu_naissance.id_for_label }}" class="form-label">Lieu de
+                                    naissance</label>
+                                {{ form.lieu_naissance }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.sexe.id_for_label }}" class="form-label">Sexe *</label>
+                                {{ form.sexe }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Photo et contact</h6>
+
+                            <div class="mb-3">
+                                <label for="{{ form.photo.id_for_label }}" class="form-label">Photo de profil</label>
+                                {{ form.photo }}
+                                {% if adherant.photo %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Photo actuelle :</small>
+                                    <img src="{{ adherant.photo.url }}" alt="Photo actuelle" class="rounded ms-2"
+                                        width="50" height="50">
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.numero.id_for_label }}" class="form-label">Numéro *</label>
+                                {{ form.numero }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.numero_parent.id_for_label }}" class="form-label">Numéro
+                                    parent</label>
+                                {{ form.numero_parent }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.residence.id_for_label }}" class="form-label">Résidence</label>
+                                {{ form.residence }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Situation</h6>
+
+                            <div class="mb-3">
+                                <label for="{{ form.situation_matrimoniale.id_for_label }}" class="form-label">Situation
+                                    matrimoniale</label>
+                                {{ form.situation_matrimoniale }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.niveau_etude.id_for_label }}" class="form-label">Niveau
+                                    d'étude</label>
+                                {{ form.niveau_etude }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.religion.id_for_label }}" class="form-label">Religion</label>
+                                {{ form.religion }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Informations scoutes</h6>
+
+                            <div class="mb-3">
+                                <label for="{{ form.unite.id_for_label }}" class="form-label">Unité *</label>
+                                {{ form.unite }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.situation.id_for_label }}" class="form-label">Situation *</label>
+                                {{ form.situation }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.date_integration.id_for_label }}" class="form-label">Date
+                                    d'intégration *</label>
+                                {{ form.date_integration }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-3">Motivation et compétences</h6>
+
+                            <div class="mb-3">
+                                <label for="{{ form.motif.id_for_label }}" class="form-label">Motif d'adhésion</label>
+                                {{ form.motif }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.motivation.id_for_label }}" class="form-label">Motivation</label>
+                                {{ form.motivation }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.competences.id_for_label }}" class="form-label">Compétences</label>
+                                {{ form.competences }}
+                                <small class="text-muted">Séparez les compétences par des virgules</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .profile-photo-lg {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .badge-container .badge {
+        font-size: 0.75rem;
+    }
+
+    .info-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-item {
+        padding: 8px 0;
+    }
+
+    .competences-tags .badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    .badge.bg-pink {
+        background-color: #e83e8c !important;
+    }
+
+    .badge.bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .profile-photo-lg {
+            width: 120px;
+            height: 120px;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+
+        .page-header,
+        .btn,
+        .modal,
+        .card-header .btn {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #000 !important;
+            break-inside: avoid;
+        }
+    }
+</style>
+
+<script>
+    // Edit Adherant Modal
+    document.addEventListener('DOMContentLoaded', function () {
+        const editAdherantBtn = document.getElementById('editAdherantBtn');
+        const editAdherantModal = new bootstrap.Modal(document.getElementById('editAdherantModal'));
+
+        if (editAdherantBtn) {
+            editAdherantBtn.addEventListener('click', function () {
+                editAdherantModal.show();
+            });
+        }
+
+        // Photo preview
+        const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
+        if (photoInput) {
+            photoInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        console.log('New photo selected:', file.name);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Date picker enhancement
+        const dateFields = document.querySelectorAll('input[type="date"]');
+        dateFields.forEach(field => {
+            field.classList.add('form-control');
+        });
+    });
+
+    // Print profile function
+    function printProfile() {
+        window.print();
+    }
+
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('#editAdherantModal form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Veuillez remplir tous les champs obligatoires (*)');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

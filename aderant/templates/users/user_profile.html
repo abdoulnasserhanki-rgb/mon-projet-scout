@@ -1,0 +1,197 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-user-circle me-2 text-primary"></i>
+                Mon Profil
+            </h1>
+            <p class="text-muted mb-0">Gérez vos informations personnelles et votre compte</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="text-muted">
+                <i class="fas fa-calendar me-2"></i>
+                Membre depuis {{ user.date_joined|date:"d/m/Y" }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sidebar Navigation -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <!-- Photo de profil -->
+                <div class="mb-4">
+                    {% if user.photo_profil %}
+                        <img src="{{ user.photo_profil.url }}" 
+                             alt="Photo de profil" 
+                             class="rounded-circle img-thumbnail"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
+                             style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Informations utilisateur -->
+                <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                <p class="card-text">
+                    <span class="badge 
+                        {% if user.role == 'ADMIN' %}badge-admin
+                        {% elif user.role == 'CHEF_UNITE' %}badge-chef-unite
+                        {% elif user.role == 'CHEF_GROUPE' %}badge-chef-groupe
+                        {% else %}badge-membre{% endif %}">
+                        {{ user.get_role_display }}
+                    </span>
+                </p>
+                <p class="text-muted small">@{{ user.username }}</p>
+                
+                <!-- Statistiques -->
+                <div class="mt-4">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6 class="mb-1">{{ user.date_joined|timesince }}</h6>
+                            <small class="text-muted">Dans l'équipe</small>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="mb-1">
+                                {% if user.last_login %}
+                                    {{ user.last_login|date:"d/m/Y" }}
+                                {% else %}
+                                    Jamais
+                                {% endif %}
+                            </h6>
+                            <small class="text-muted">Dernière connexion</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Paramètres
+                </h6>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'edit_profile' %}" 
+                   class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Modifier le profil
+                </a>
+                <a href="{% url 'change_password' %}" 
+                   class="list-group-item list-group-item-action {% if active_tab == 'password' %}active{% endif %}">
+                    <i class="fas fa-key me-2"></i>
+                    Changer le mot de passe
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Area -->
+    <div class="col-md-8">
+        <!-- Informations personnelles -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Informations Personnelles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Nom d'utilisateur:</strong><br>
+                        {{ user.username }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Email:</strong><br>
+                        {{ user.email|default:"Non renseigné" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Téléphone:</strong><br>
+                        {{ user.telephone|default:"Non renseigné" }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Rôle:</strong><br>
+                        <span class="badge 
+                            {% if user.role == 'ADMIN' %}badge-admin
+                            {% elif user.role == 'CHEF_UNITE' %}badge-chef-unite
+                            {% elif user.role == 'CHEF_GROUPE' %}badge-chef-groupe
+                            {% else %}badge-membre{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Statut du compte:</strong><br>
+                        {% if user.is_active %}
+                            <span class="badge bg-success">Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactif</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions rapides -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-edit fa-2x text-primary mb-3"></i>
+                        <h6>Modifier le profil</h6>
+                        <p class="small text-muted">Mettez à jour vos informations personnelles</p>
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm">
+                            Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-key fa-2x text-warning mb-3"></i>
+                        <h6>Mot de passe</h6>
+                        <p class="small text-muted">Changez votre mot de passe régulièrement</p>
+                        <a href="{% url 'change_password' %}" class="btn btn-outline-warning btn-sm">
+                            Changer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-admin { background-color: #e74c3c; }
+    .badge-chef-unite { background-color: #3498db; }
+    .badge-chef-groupe { background-color: #f39c12; }
+    .badge-membre { background-color: #27ae60; }
+    
+    .list-group-item.active {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}

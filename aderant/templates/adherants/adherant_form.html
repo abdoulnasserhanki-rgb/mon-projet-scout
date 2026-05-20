@@ -1,0 +1,697 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-user-plus me-2 text-success"></i>
+                Ajouter un Nouvel Adhérent
+            </h1>
+            <p class="text-muted mb-0">Remplissez le formulaire ci-dessous pour ajouter un nouvel adhérent au système</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'adherant_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Steps -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body py-3">
+                <div class="progress-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Informations Personnelles</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Éducation & Compétences</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Adhésion & Photo</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Form -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-id-card me-2 text-primary"></i>
+                    Informations de l'Adhérent
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="adherantForm" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Informations Personnelles Section -->
+                    <div class="form-section">
+                        <h6 class="section-title mb-4">
+                            <i class="fas fa-user me-2 text-primary"></i>
+                            Informations Personnelles
+                        </h6>
+                        
+                        <div class="row">
+                            <!-- Nom -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nom.id_for_label }}" class="form-label">
+                                    Nom <span class="text-danger">*</span>
+                                </label>
+                                {{ form.nom }}
+                                {% if form.nom.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.nom.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Prénom -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.prenom.id_for_label }}" class="form-label">
+                                    Prénom <span class="text-danger">*</span>
+                                </label>
+                                {{ form.prenom }}
+                                {% if form.prenom.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.prenom.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Date de Naissance -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_naissance.id_for_label }}" class="form-label">
+                                    Date de Naissance <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    {{ form.date_naissance }}
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar"></i>
+                                    </span>
+                                </div>
+                                {% if form.date_naissance.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_naissance.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Lieu de Naissance -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.lieu_naissance.id_for_label }}" class="form-label">
+                                    Lieu de Naissance <span class="text-danger">*</span>
+                                </label>
+                                {{ form.lieu_naissance }}
+                                {% if form.lieu_naissance.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.lieu_naissance.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Sexe -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.sexe.id_for_label }}" class="form-label">
+                                    Sexe <span class="text-danger">*</span>
+                                </label>
+                                {{ form.sexe }}
+                                {% if form.sexe.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.sexe.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Situation Matrimoniale -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.situation_matrimoniale.id_for_label }}" class="form-label">
+                                    Situation Matrimoniale <span class="text-danger">*</span>
+                                </label>
+                                {{ form.situation_matrimoniale }}
+                                {% if form.situation_matrimoniale.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.situation_matrimoniale.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- numéro téléphone -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.sexe.id_for_label }}" class="form-label">
+                                    Téléphone Adhérant 
+                                </label>
+                                {{ form.numero }}
+                                {% if form.numero.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.numero.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- numero parent -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.situation_matrimoniale.id_for_label }}" class="form-label">
+                                    Téléphone Parent
+                                </label>
+                                {{ form.numero_parent }}
+                                {% if form.numero_parent.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.numero_parent.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Résidence -->
+                            <div class="col-6 mb-3">
+                                <label for="{{ form.residence.id_for_label }}" class="form-label">
+                                    Résidence <span class="text-danger">*</span>
+                                </label>
+                                {{ form.residence }}
+                                {% if form.residence.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.residence.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <!-- Religion -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.religion.id_for_label }}" class="form-label">
+                                    Religion <span class="text-danger">*</span>
+                                </label>
+                                {{ form.religion }}
+                                {% if form.religion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.religion.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Éducation et Compétences Section -->
+                    <div class="form-section mt-4">
+                        <h6 class="section-title mb-4">
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                            Éducation & Compétences
+                        </h6>
+                        
+                        <div class="row">
+                            <!-- Niveau d'Étude -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.niveau_etude.id_for_label }}" class="form-label">
+                                    Niveau d'Étude
+                                </label>
+                                {{ form.niveau_etude }}
+                                {% if form.niveau_etude.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.niveau_etude.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                        <!-- Compétences -->
+                        <div class="row">
+                            <div class="col-6 mb-6">
+                                <label for="{{ form.competences.id_for_label }}" class="form-label">
+                                    Compétences
+                                </label>
+                                {{ form.competences }}
+                                <div class="form-text">
+                                    Séparez les compétences par des virgules (ex: Programmation, Gestion, Communication)
+                                </div>
+                                {% if form.competences.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.competences.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations d'Adhésion Section -->
+                    <div class="form-section mt-4">
+                        <h6 class="section-title mb-4">
+                            <i class="fas fa-users me-2 text-primary"></i>
+                            Informations d'Adhésion
+                        </h6>
+                        
+                        <div class="row">
+                            <!-- Date d'Intégration -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_integration.id_for_label }}" class="form-label">
+                                    Date d'Intégration <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    {{ form.date_integration }}
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </span>
+                                </div>
+                                {% if form.date_integration.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_integration.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Motif -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.motif.id_for_label }}" class="form-label">
+                                    Motif d'Adhésion 
+                                </label>
+                                {{ form.motif }}
+                                {% if form.motif.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.motif.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Unité -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.unite.id_for_label }}" class="form-label">
+                                    Unité <span class="text-danger">*</span>
+                                </label>
+                                {{ form.unite }}
+                                {% if form.unite.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.unite.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Situation -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.situation.id_for_label }}" class="form-label">
+                                    Situation <span class="text-danger">*</span>
+                                </label>
+                                {{ form.situation }}
+                                {% if form.situation.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.situation.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            
+
+                            <!-- Motivation -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.motivation.id_for_label }}" class="form-label">
+                                    Motivation 
+                                </label>
+                                {{ form.motivation }}
+                                {% if form.motivation.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.motivation.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Date de Création -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_creation.id_for_label }}" class="form-label">
+                                    Date de Création <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    {{ form.date_creation }}
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </span>
+                                </div>
+                                {% if form.date_creation.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_creation.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Photo Section -->
+                    <div class="form-section mt-4">
+                        <h6 class="section-title mb-4">
+                            <i class="fas fa-camera me-2 text-primary"></i>
+                            Photo de Profil
+                        </h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.photo.id_for_label }}" class="form-label">
+                                    Photo
+                                </label>
+                                <div class="file-upload-area">
+                                    {{ form.photo }}
+                                    <div class="file-upload-preview mt-3 text-center d-none" id="photoPreview">
+                                        <img id="previewImage" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="removePhoto">
+                                            <i class="fas fa-times me-1"></i>Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                                {% if form.photo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.photo.errors.0 }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    Formats acceptés: JPG, PNG, GIF. Taille max: 2MB
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="photo-placeholder text-center">
+                                    <div class="placeholder-image bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <div class="text-center">
+                                            <i class="fas fa-user fa-3x text-muted mb-2"></i>
+                                            <p class="text-muted small">Aperçu de la photo</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions mt-5 pt-4 border-top">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo me-2"></i>
+                                    Réinitialiser
+                                </button>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a href="{% url 'adherant_list' %}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>
+                                    Annuler
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>
+                                    Enregistrer l'Adhérent
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+    }
+    
+    .step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 60%;
+        width: 80%;
+        height: 2px;
+        background-color: #dee2e6;
+        z-index: 1;
+    }
+    
+    .step.active:not(:last-child)::after {
+        background-color: #3498db;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .step.active .step-number {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .step.active .step-label {
+        color: #3498db;
+        font-weight: 500;
+    }
+    
+    .form-section {
+        padding: 25px;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+    
+    .section-title {
+        color: #2c3e50;
+        font-weight: 600;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select, .form-textarea {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px 12px;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    
+    .form-control:focus, .form-select:focus, .form-textarea:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #3498db;
+        background-color: #f8f9fa;
+    }
+    
+    .form-actions {
+        background-color: #f8f9fa;
+        margin: 0 -25px -25px;
+        padding: 25px;
+        border-radius: 0 0 10px 10px;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    
+    .invalid-feedback {
+        font-size: 0.8rem;
+    }
+    
+    .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+    }
+    
+    .numero-counter-warning {
+        color: #e74c3c;
+        font-weight: 500;
+    }
+</style>
+
+<script>
+    // Photo preview functionality
+    document.getElementById('{{ form.photo.id_for_label }}').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('photoPreview');
+        const previewImage = document.getElementById('previewImage');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                preview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Remove photo
+    document.getElementById('removePhoto').addEventListener('click', function() {
+        document.getElementById('{{ form.photo.id_for_label }}').value = '';
+        document.getElementById('photoPreview').classList.add('d-none');
+    });
+    
+    // Form validation
+    document.getElementById('adherantForm').addEventListener('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+    
+    // Set today's date as default for date fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        const dateIntegrationField = document.getElementById('{{ form.date_integration.id_for_label }}');
+        if (dateIntegrationField && !dateIntegrationField.value) {
+            dateIntegrationField.value = today;
+        }
+        
+        const dateCreationField = document.getElementById('{{ form.date_creation.id_for_label }}');
+        if (dateCreationField && !dateCreationField.value) {
+            dateCreationField.value = today;
+        }
+        
+       
+    });
+    
+    // Character counter for numero field (max 8 caractères)
+    const numeroField = document.getElementById('{{ form.numero.id_for_label }}');
+    if (numeroField) {
+        const counter = document.getElementById('numeroCounter');
+        
+        function updateNumeroCounter() {
+            const length = numeroField.value.length;
+            const maxLength = 8;
+            counter.textContent = `${length}/${maxLength} caractères`;
+            
+            if (length > maxLength) {
+                counter.className = 'form-text numero-counter-warning';
+                // Tronquer à 8 caractères
+                numeroField.value = numeroField.value.substring(0, maxLength);
+                updateNumeroCounter(); // Mettre à jour le compteur après troncation
+            } else if (length === maxLength) {
+                counter.className = 'form-text text-success';
+            } else if (length > maxLength * 0.8) {
+                counter.className = 'form-text text-warning';
+            } else {
+                counter.className = 'form-text';
+            }
+        }
+        
+        numeroField.addEventListener('input', updateNumeroCounter);
+        numeroField.setAttribute('maxlength', '8'); // Définir l'attribut maxlength
+        updateNumeroCounter();
+    }
+    
+    // Character counter for competences field
+    const competencesField = document.getElementById('{{ form.competences.id_for_label }}');
+    if (competencesField) {
+        const counter = document.createElement('div');
+        counter.className = 'form-text text-end';
+        counter.id = 'competencesCounter';
+        competencesField.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const length = competencesField.value.length;
+            const maxLength = competencesField.getAttribute('maxlength') || 255;
+            counter.textContent = `${length}/${maxLength} caractères`;
+            
+            if (length > maxLength * 0.8) {
+                counter.className = 'form-text text-end text-warning';
+            } else {
+                counter.className = 'form-text text-end';
+            }
+        }
+        
+        competencesField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+    
+    // Empêcher la saisie au-delà de 8 caractères pour le numéro
+    numeroField.addEventListener('keypress', function(e) {
+        if (this.value.length >= 8) {
+            e.preventDefault();
+        }
+    });
+    
+    // Validation côté client pour le numéro
+    numeroField.addEventListener('blur', function() {
+        if (this.value.length > 8) {
+            this.value = this.value.substring(0, 8);
+            updateNumeroCounter();
+        }
+    });
+</script>
+{% endblock %}

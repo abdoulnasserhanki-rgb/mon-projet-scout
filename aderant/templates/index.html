@@ -1,0 +1,232 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                Tableau de Bord
+            </h1>
+            <p class="text-muted mb-0">Aperçu général de votre gestion des adhérents</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="text-muted">
+                <i class="fas fa-calendar me-2"></i>
+                {% now "l j F Y" %}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="content-section">
+    <h3 class="section-title">
+        <i class="fas fa-chart-line me-2 text-primary"></i>
+        Statistiques Globales des Adhérents
+    </h3>
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="text-primary">
+                    <i class="fas fa-users stat-icon"></i>
+                </div>
+                <h4 class="text-primary mb-1">{{ total_adherants }}</h4>
+                <p class="text-muted mb-2">Total Adhérents</p>
+                <div class="d-flex align-items-center">
+                    <span class="badge {% if evolution_total > 0 %}bg-success{% else %}bg-danger{% endif %} me-2">
+                        <i class="fas {% if evolution_total > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %} me-1"></i>
+                        {{ evolution_total }}%
+                    </span>
+                    <small class="text-muted">ce mois</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="text-success">
+                    <i class="fas fa-user-plus stat-icon"></i>
+                </div>
+                <h4 class="text-success mb-1">{{ nouveaux_mois }}</h4>
+                <p class="text-muted mb-2">Nouveaux ce mois</p>
+                <div class="d-flex align-items-center">
+                    <span class="badge {% if evolution_nouveaux > 0 %}bg-success{% else %}bg-danger{% endif %} me-2">
+                        <i class="fas {% if evolution_nouveaux > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %} me-1"></i>
+                        {{ evolution_nouveaux }}%
+                    </span>
+                    <small class="text-muted">vs mois dernier</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="text-warning">
+                    <i class="fas fa-venus-mars stat-icon"></i>
+                </div>
+                <h4 class="text-warning mb-1">{{ pourcentage_femmes }}%</h4>
+                <p class="text-muted mb-2">Féminins</p>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-info me-2">
+                        {{ total_femmes }}/{{ total_adherants }}
+                    </span>
+                    <small class="text-muted">ratio</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="text-info">
+                    <i class="fas fa-graduation-cap stat-icon"></i>
+                </div>
+                <h4 class="text-info mb-1">{{ moyenne_age }} ans</h4>
+                <p class="text-muted mb-2">Âge Moyen</p>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-primary me-2">
+                        <i class="fas fa-calendar me-1"></i>
+                    </span>
+                    <small class="text-muted">moyenne</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques détaillées -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="stats-mini-card">
+                <h6 class="text-muted mb-3">
+                    <i class="fas fa-map-marker-alt me-2"></i>Répartition par Résidence
+                </h6>
+                {% for residence in residences_stats %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">{{ residence.ville|truncatechars:20 }}</span>
+                    <div class="d-flex align-items-center">
+                        <div class="progress me-2" style="width: 100px; height: 8px;">
+                            <div class="progress-bar bg-primary"></div>
+                        </div>
+                        <span class="small text-muted">{{ residence.count }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small">Aucune donnée de résidence</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="stats-mini-card">
+                <h6 class="text-muted mb-3">
+                    <i class="fas fa-graduation-cap me-2"></i>Niveau d'Étude
+                </h6>
+                {% for niveau in niveaux_etude_stats %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">{{ niveau.niveau|truncatechars:20 }}</span>
+                    <div class="d-flex align-items-center">
+                        <div class="progress me-2" style="width: 100px; height: 8px;">
+                            <div class="progress-bar bg-success"></div>
+                        </div>
+                        <span class="small text-muted">{{ niveau.count }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small">Aucune donnée d'étude</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Admin - Statistiques Utilisateurs -->
+{% for user_recent in utilisateurs_recents %}
+<div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
+    {% if user_recent.photo %}
+    <img src="{{ user_recent.photo.url }}" alt="{{ user_recent.username }}" 
+         class="rounded-circle me-2" width="32" height="32">
+    {% else %}
+    <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" 
+         style="width: 32px; height: 32px;">
+        <i class="fas fa-user text-white small"></i>
+    </div>
+    {% endif %}
+    <div class="flex-grow-1">
+        <strong class="small">{{ user_recent.get_full_name|default:user_recent.username }}</strong>
+        <br>
+        <small class="text-muted">Connecté {{ user_recent.last_login|timesince }}</small>
+    </div>
+    <span class="badge {% if user_recent.is_superuser %}bg-danger{% else %}bg-info{% endif %} small">
+        {% if user_recent.is_superuser %}Admin{% else %}Utilisateur{% endif %}
+    </span>
+</div>
+{% endfor %}
+
+<!-- Quick Actions -->
+<div class="content-section">
+    <h3 class="section-title">
+        <i class="fas fa-bolt me-2 text-warning"></i>
+        Actions Rapides
+    </h3>
+    <div class="row quick-actions">
+        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6">
+            <a href="{% url 'adherant_create' %}" class="btn btn-success w-100">
+                <i class="fas fa-user-plus"></i>
+                <br>
+                <span>Nouvel Adhérent</span>
+            </a>
+        </div>
+        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6">
+            <a href="{% url 'adherant_list' %}" class="btn btn-primary w-100">
+                <i class="fas fa-list"></i>
+                <br>
+                <span>Liste Complète</span>
+            </a>
+        </div>
+        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6">
+            <a href="#" class="btn btn-info w-100">
+                <i class="fas fa-file-export"></i>
+                <br>
+                <span>Exporter</span>
+            </a>
+        </div>
+        {% if user.is_superuser %}
+        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6">
+            <a href="{% url 'admin:index' %}" class="btn btn-danger w-100">
+                <i class="fas fa-cog"></i>
+                <br>
+                <span>Administration</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.stats-card-admin {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ffeaa7;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.1);
+    transition: transform 0.2s;
+}
+
+.stats-card-admin:hover {
+    transform: translateY(-2px);
+}
+
+.stats-mini-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #007bff;
+}
+
+.border-warning {
+    border-left: 4px solid #ffc107 !important;
+}
+</style>
+{% endblock %}

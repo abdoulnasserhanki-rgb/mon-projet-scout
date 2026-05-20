@@ -1,0 +1,692 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-users me-2 text-primary"></i>
+                Gestion des Adhérents
+            </h1>
+            <p class="text-muted mb-0">Liste complète de tous les adhérents du système</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            {% if user.role == 'CHEF_GROUPE' or user.role == 'CHEF_UNITE' or user.role == 'CHEF_SECTION' %}
+            <a href="{% url 'adherant_create' %}" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>
+                Nouvel Adhérent
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-primary">
+                <i class="fas fa-users stat-icon"></i>
+            </div>
+            <h4 class="text-primary mb-1">{{ total_adherants }}</h4>
+            <p class="text-muted mb-0">Total Adhérents</p>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-success">
+                <i class="fas fa-user-check stat-icon"></i>
+            </div>
+            <h4 class="text-success mb-1">{{ hommes_count }}</h4>
+            <p class="text-muted mb-0">Hommes</p>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-info">
+                <i class="fas fa-user-friends stat-icon"></i>
+            </div>
+            <h4 class="text-info mb-1">{{ femmes_count }}</h4>
+            <p class="text-muted mb-0">Femmes</p>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-warning">
+                <i class="fas fa-campground stat-icon"></i>
+            </div>
+            <h4 class="text-warning mb-1">{{ louveteaux_count }}</h4>
+            <p class="text-muted mb-0">Louveteaux</p>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-danger">
+                <i class="fas fa-bolt stat-icon"></i>
+            </div>
+            <h4 class="text-danger mb-1">{{ eclaireurs_count }}</h4>
+            <p class="text-muted mb-0">Éclaireurs</p>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stats-card">
+            <div class="text-purple">
+                <i class="fas fa-hiking stat-icon"></i>
+            </div>
+            <h4 class="text-purple mb-1">{{ cheminots_count }}</h4>
+            <p class="text-muted mb-0">Cheminots</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics by Branch -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>
+                    Statistiques par Branche
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="branch-stats-card branch-louveteau">
+                            <div class="branch-icon">
+                                <i class="fas fa-campground"></i>
+                            </div>
+                            <div class="branch-info">
+                                <h4 class="mb-1">{{ louveteaux_count }}</h4>
+                                <p class="mb-1">Louveteaux</p>
+                                <div class="branch-progress">
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-warning" style="width: {{ louveteaux_pourcentage }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ louveteaux_pourcentage }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="branch-stats-card branch-eclaireur">
+                            <div class="branch-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="branch-info">
+                                <h4 class="mb-1">{{ eclaireurs_count }}</h4>
+                                <p class="mb-1">Éclaireurs</p>
+                                <div class="branch-progress">
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-danger" style="width: {{ eclaireurs_pourcentage }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ eclaireurs_pourcentage }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="branch-stats-card branch-cheminot">
+                            <div class="branch-icon">
+                                <i class="fas fa-hiking"></i>
+                            </div>
+                            <div class="branch-info">
+                                <h4 class="mb-1">{{ cheminots_count }}</h4>
+                                <p class="mb-1">Cheminots</p>
+                                <div class="branch-progress">
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-purple" style="width: {{ cheminots_pourcentage }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ cheminots_pourcentage }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="branch-stats-card branch-route">
+                            <div class="branch-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="branch-info">
+                                <h4 class="mb-1">{{ routiers_count }}</h4>
+                                <p class="mb-1">Routiers</p>
+                                <div class="branch-progress">
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-info" style="width: {{ routiers_pourcentage }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ routiers_pourcentage }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search Bar -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" placeholder="Rechercher..." id="searchInput">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="uniteFilter">
+                            <option value="">Toutes les unités</option>
+                            <option value="liberte">Liberté</option>
+                            <option value="boukoki">Boukoki</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="situationFilter">
+                            <option value="">Toutes les situations</option>
+                            <option value="actif">Actif</option>
+                            <option value="aleatoire">Aléatoire</option>
+                            <option value="suspendu">Suspendu</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="brancheFilter">
+                            <option value="">Toutes les branches</option>
+                            <option value="Louveteau">Louveteau</option>
+                            <option value="Éclaireur">Éclaireur</option>
+                            <option value="Cheminot">Cheminot</option>
+                            <option value="Routier">Routier</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="sexeFilter">
+                            <option value="">Tous les sexes</option>
+                            <option value="M">Homme</option>
+                            <option value="F">Femme</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                            <i class="fas fa-redo me-1"></i>Réinitialiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Adhérents Grid -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2 text-primary"></i>
+                        Liste des Adhérents ({{ adherants|length }})
+                    </h5>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm active" id="gridView">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="listView">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Grid View -->
+                <div class="row" id="gridViewContainer">
+                    {% for adherant in adherants %}
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4 adherant-item" 
+                         data-unite="{{ adherant.unite }}" 
+                         data-situation="{{ adherant.situation }}"
+                         data-branche="{{ adherant.branche }}"
+                         data-sexe="{{ adherant.sexe }}"
+                         data-search="{{ adherant.nom|lower }} {{ adherant.prenom|lower }} {{ adherant.numero|lower }}">
+                        <div class="adherant-card">
+                            <div class="position-relative">
+                                {% if adherant.photo %}
+                                    <img src="{{ adherant.photo.url }}" alt="Photo de {{ adherant.nom }}" class="adherant-photo">
+                                {% else %}
+                                    <div class="adherant-photo bg-light d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-user text-muted fa-2x"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="position-absolute top-0 start-0 badge {% if adherant.sexe == 'M' %}bg-primary{% else %}bg-pink{% endif %} small">
+                                    {{ adherant.get_sexe_display }}
+                                </span>
+                                <span class="position-absolute top-0 end-0 badge {% if adherant.branche == 'Louveteau' %}bg-warning{% elif adherant.branche == 'Éclaireur' %}bg-danger{% elif adherant.branche == 'Cheminot' %}bg-purple{% else %}bg-info{% endif %} small">
+                                    {{ adherant.branche }}
+                                </span>
+                                {% if adherant.est_nouveau %}
+                                <span class="position-absolute bottom-0 start-0 badge bg-success small">
+                                    <i class="fas fa-star me-1"></i>Nouveau
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="mb-1 fw-bold">{{ adherant.prenom }} {{ adherant.nom }}</h5>
+                            <p class="text-muted mb-1 small">
+                                <i class="fas fa-hashtag me-1"></i>
+                                {{ adherant.numero }}
+                            </p>
+                            <p class="text-muted mb-2 small">
+                                <i class="fas fa-building me-1"></i>
+                                {{ adherant.unite }}
+                            </p>
+                            
+                            <div class="adherant-info mb-3">
+                                <p class="small text-muted mb-1">
+                                    <i class="fas fa-venus-mars me-1"></i>
+                                    {{ adherant.get_sexe_display }}, {{ adherant.situation_matrimoniale }}
+                                </p>
+                                <p class="small text-muted mb-1">
+                                    <i class="fas fa-graduation-cap me-1"></i>
+                                    {{ adherant.niveau_etude }}
+                                </p>
+                                <p class="small text-muted mb-1">
+                                    <i class="fas fa-home me-1"></i>
+                                    {{ adherant.residence }}
+                                </p>
+                                <p class="small text-muted mb-0">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Âge: {{ adherant.age }} ans
+                                </p>
+                                <p class="small {% if adherant.est_nouveau %}text-success fw-bold{% else %}text-muted{% endif %} mb-0">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {% if adherant.est_nouveau %}
+                                    Nouvel adhérent
+                                    {% else %}
+                                    Membre depuis {{ adherant.date_integration|date:"d/m/Y" }}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            {% if adherant.competences %}
+                            <div class="competences-tags mb-3">
+                                {% for competence in adherant.competences|slice:":3" %}
+                                <span class="badge bg-light text-dark small me-1 mb-1">{{ competence }}</span>
+                                {% endfor %}
+                                {% if adherant.competences|length > 3 %}
+                                <span class="badge bg-secondary small">+{{ adherant.competences|length|add:"-3" }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'adherant_detail' adherant.id %}" class="btn btn-sm btn-outline-primary" title="Voir détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if user.role == 'CHEF_GROUPE' or user.role == 'CHEF_UNITE' and adherant.unite == user.unite or user.role == 'CHEF_SECTION' and adherant.section == user.section %}
+                                <a href="" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" title="Modification non autorisée" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucun adhérent trouvé</h4>
+                            <p class="text-muted mb-4">Commencez par ajouter votre premier adhérent</p>
+                            {% if user.role == 'CHEF_GROUPE' or user.role == 'CHEF_UNITE' or user.role == 'CHEF_SECTION' %}
+                            <a href="{% url 'adherant_create' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Ajouter le premier adhérent
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div class="table-responsive d-none" id="listViewContainer">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Photo</th>
+                                <th>Nom & Prénom</th>
+                                <th>Numéro</th>
+                                <th>Sexe</th>
+                                <th>Âge</th>
+                                <th>Branche</th>
+                                <th>Unité</th>
+                                <th>Résidence</th>
+                                <th>Statut</th>
+                                <th>Situation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for adherant in adherants %}
+                            <tr class="adherant-item" 
+                                data-unite="{{ adherant.unite }}" 
+                                data-situation="{{ adherant.situation }}"
+                                data-branche="{{ adherant.branche }}"
+                                data-sexe="{{ adherant.get_sexe_display }}"
+                                data-search="{{ adherant.nom|lower }} {{ adherant.prenom|lower }} {{ adherant.numero|lower }}">
+                                <td>
+                                    {% if adherant.photo %}
+                                        <img src="{{ adherant.photo.url }}" alt="Photo" class="rounded-circle" width="40" height="40">
+                                    {% else %}
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if adherant.est_nouveau %}
+                                    <span class="position-absolute top-0 start-0 badge bg-success small" style="font-size: 8px;">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ adherant.nom }} {{ adherant.prenom }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ adherant.niveau_etude }}</small>
+                                </td>
+                                <td>
+                                    <code>{{ adherant.numero }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge {% if adherant.sexe == 'M' %}bg-primary{% else %}bg-pink{% endif %}">
+                                        {{ adherant.get_sexe_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ adherant.age }} ans</strong>
+                                </td>
+                                <td>
+                                    <span class="badge {% if adherant.branche == 'Louveteau' %}bg-warning{% elif adherant.branche == 'Éclaireur' %}bg-danger{% elif adherant.branche == 'Cheminot' %}bg-purple{% else %}bg-info{% endif %}">
+                                        {{ adherant.branche }}
+                                    </span>
+                                </td>
+                                <td>{{ adherant.unite }}</td>
+                                <td>{{ adherant.residence }}</td>
+                                <td>
+                                    {% if adherant.est_nouveau %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-star me-1"></i>Nouveau
+                                    </span>
+                                    {% else %}
+                                    <small class="text-muted">
+                                        Depuis {{ adherant.date_integration|date:"d/m/Y" }}
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        {{ adherant.situation }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'adherant_detail' adherant.id %}" class="btn btn-outline-primary" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if user.role == 'CHEF_GROUPE' or user.role == 'CHEF_UNITE' and adherant.unite == user.unite or user.role == 'CHEF_SECTION' and adherant.section == user.section %}
+                                        <a href="" class="btn btn-outline-warning" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% else %}
+                                        <button class="btn btn-outline-secondary" title="Modification non autorisée" disabled>
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-secondary" title="Suppression non autorisée" disabled>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if adherants.has_other_pages %}
+<div class="row mt-4">
+    <div class="col-12">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if adherants.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ adherants.previous_page_number }}" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for i in adherants.paginator.page_range %}
+                {% if i > adherants.number|add:"-3" and i < adherants.number|add:"3" %}
+                <li class="page-item {% if adherants.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if adherants.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ adherants.next_page_number }}" aria-label="Next">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .adherant-info {
+        border-top: 1px solid #f0f0f0;
+        padding-top: 10px;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    
+    .badge.bg-pink {
+        background-color: #e83e8c !important;
+    }
+    
+    .badge.bg-purple {
+        background-color: #6f42c1 !important;
+    }
+    
+    .competences-tags {
+        border-top: 1px solid #f0f0f0;
+        padding-top: 10px;
+    }
+    
+    .adherant-card {
+        position: relative;
+    }
+    
+    .stats-card {
+        text-align: center;
+    }
+    
+    .stats-card h4 {
+        font-size: 1.5rem;
+    }
+    
+    .branch-stats-card {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-radius: 10px;
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+    }
+    
+    .branch-louveteau {
+        border-left-color: #ffc107;
+    }
+    
+    .branch-eclaireur {
+        border-left-color: #dc3545;
+    }
+    
+    .branch-cheminot {
+        border-left-color: #6f42c1;
+    }
+    
+    .branch-route {
+        border-left-color: #17a2b8;
+    }
+    
+    .branch-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        color: #6c757d;
+    }
+    
+    .branch-louveteau .branch-icon {
+        color: #ffc107;
+    }
+    
+    .branch-eclaireur .branch-icon {
+        color: #dc3545;
+    }
+    
+    .branch-cheminot .branch-icon {
+        color: #6f42c1;
+    }
+    
+    .branch-route .branch-icon {
+        color: #17a2b8;
+    }
+    
+    .branch-info h4 {
+        margin-bottom: 5px;
+        font-size: 1.5rem;
+    }
+    
+    .branch-progress {
+        margin-top: 5px;
+    }
+    
+    .position-relative {
+        position: relative;
+    }
+</style>
+
+<script>
+    // View Toggle
+    document.getElementById('gridView').addEventListener('click', function() {
+        document.getElementById('gridViewContainer').classList.remove('d-none');
+        document.getElementById('listViewContainer').classList.add('d-none');
+        this.classList.add('active');
+        document.getElementById('listView').classList.remove('active');
+    });
+    
+    document.getElementById('listView').addEventListener('click', function() {
+        document.getElementById('gridViewContainer').classList.add('d-none');
+        document.getElementById('listViewContainer').classList.remove('d-none');
+        this.classList.add('active');
+        document.getElementById('gridView').classList.remove('active');
+    });
+
+    // Search and Filter Functionality
+    function filterAdherants() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const uniteFilter = document.getElementById('uniteFilter').value;
+        const situationFilter = document.getElementById('situationFilter').value;
+        const brancheFilter = document.getElementById('brancheFilter').value;
+        const sexeFilter = document.getElementById('sexeFilter').value;
+        
+        const adherantItems = document.querySelectorAll('.adherant-item');
+        
+        adherantItems.forEach(item => {
+            const searchData = item.getAttribute('data-search');
+            const unite = item.getAttribute('data-unite');
+            const situation = item.getAttribute('data-situation');
+            const branche = item.getAttribute('data-branche');
+            const sexe = item.getAttribute('data-sexe');
+            
+            const matchesSearch = searchData.includes(searchTerm);
+            const matchesUnite = !uniteFilter || unite === uniteFilter;
+            const matchesSituation = !situationFilter || situation === situationFilter;
+            const matchesBranche = !brancheFilter || branche === brancheFilter;
+            const matchesSexe = !sexeFilter || sexe === sexeFilter;
+            
+            item.style.display = (matchesSearch && matchesUnite && matchesSituation && matchesBranche && matchesSexe) ? '' : 'none';
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('keyup', filterAdherants);
+    document.getElementById('uniteFilter').addEventListener('change', filterAdherants);
+    document.getElementById('situationFilter').addEventListener('change', filterAdherants);
+    document.getElementById('brancheFilter').addEventListener('change', filterAdherants);
+    document.getElementById('sexeFilter').addEventListener('change', filterAdherants);
+
+    // Reset Filters
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('uniteFilter').value = '';
+        document.getElementById('situationFilter').value = '';
+        document.getElementById('brancheFilter').value = '';
+        document.getElementById('sexeFilter').value = '';
+        filterAdherants();
+    });
+
+    // Initialize filters with any URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('search');
+        const uniteParam = urlParams.get('unite');
+        const situationParam = urlParams.get('situation');
+        const brancheParam = urlParams.get('branche');
+        const sexeParam = urlParams.get('sexe');
+        
+        if (searchParam) {
+            document.getElementById('searchInput').value = searchParam;
+        }
+        if (uniteParam) {
+            document.getElementById('uniteFilter').value = uniteParam;
+        }
+        if (situationParam) {
+            document.getElementById('situationFilter').value = situationParam;
+        }
+        if (brancheParam) {
+            document.getElementById('brancheFilter').value = brancheParam;
+        }
+        if (sexeParam) {
+            document.getElementById('sexeFilter').value = sexeParam;
+        }
+        
+        filterAdherants();
+    });
+</script>
+{% endblock %}
