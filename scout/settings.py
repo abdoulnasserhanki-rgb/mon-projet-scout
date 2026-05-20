@@ -24,6 +24,7 @@ DEFAULT_SUPERADMIN_ROLE = os.environ.get('DEFAULT_SUPERADMIN_ROLE', 'ADMIN')
 ALLOWED_HOSTS = [
     'maitrise-tegama.anyh-tech.com',
     'www.maitrise-tegama.anyh-tech.com',
+    'mon-projet-scout.onrender.com',
     'localhost',
     '127.0.0.1'
 ]
@@ -52,7 +53,11 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 SECRET_KEY = 'django-insecure-9s4k)nm4d_(8z84x=mhk-d=d#dqc&&an)5whw$&!hi%#*h^r7r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://mon-projet-scout.onrender.com"
+]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -73,6 +78,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
