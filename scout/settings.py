@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
-BASE_URL = 'http://localhost:8000'
+BASE_URL = os.environ.get('BASE_URL', 'https://groupe-tegama.onrender.com')
 
 DATABASE_URL='postgresql://mon_projet_scout_db_user:IHIfQPuHe42C7TG2eXJtVLBddKfMb6VL@dpg-d86tcv37uimc73alot10-a/mon_projet_scout_db'
 
