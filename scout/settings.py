@@ -57,7 +57,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 SECRET_KEY = 'django-insecure-9s4k)nm4d_(8z84x=mhk-d=d#dqc&&an)5whw$&!hi%#*h^r7r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://groupe-tegama.onrender.com"
