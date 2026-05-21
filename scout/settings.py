@@ -60,7 +60,7 @@ SECRET_KEY = 'django-insecure-9s4k)nm4d_(8z84x=mhk-d=d#dqc&&an)5whw$&!hi%#*h^r7r
 DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://mon-projet-scout.onrender.com"
+    "https://groupe-tegama.onrender.com"
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -13,7 +13,7 @@ def send_account_creation_email(user, temporary_password):
     
     try:
         # Vérifier que BASE_URL est configuré
-        base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+        base_url = getattr(settings, 'BASE_URL', 'https://groupe-tegama.onrender.com')
         
         # Context pour le template
         context = {
@@ -49,7 +49,7 @@ def send_password_reset_email(user, new_password):
     subject = "Réinitialisation de votre mot de passe"
     
     try:
-        base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+        base_url = getattr(settings, 'BASE_URL', 'https://groupe-tegama.onrender.com')
         
         context = {
             'user': user,
