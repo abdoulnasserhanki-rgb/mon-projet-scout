@@ -25,6 +25,7 @@ DEFAULT_SUPERADMIN_ROLE = os.environ.get('DEFAULT_SUPERADMIN_ROLE', 'ADMIN')
 ALLOWED_HOSTS = [
     'maitrise-tegama.anyh-tech.com',
     'www.maitrise-tegama.anyh-tech.com',
+    "groupe-tegama.onrender.com",
     'mon-projet-scout.onrender.com',
     'localhost',
     '127.0.0.1'
