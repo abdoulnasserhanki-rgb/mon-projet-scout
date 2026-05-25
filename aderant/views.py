@@ -459,10 +459,20 @@ def preinscription_approve(request, preinscription_id):
         return redirect('accueil')
     preinscription = get_object_or_404(Preinscription, id=preinscription_id, status='PENDING')
     if request.method == 'POST':
-        try:
-            preinscription.approve(request.user)
-            messages.success(request, 'La préinscription a été validée et l’adhérent a été ajouté à la base.')
-        except ValidationError as e:
-            messages.error(request, e.message)
+        duplicate_exists = Adherant.objects.filter(
+            nom__iexact=preinscription.nom.strip(),
+            prenom__iexact=preinscription.prenom.strip(),
+            date_naissance=preinscription.date_naissance,
+            lieu_naissance__iexact=preinscription.lieu_naissance.strip(),
+        ).exists()
+        if duplicate_exists:
+            preinscription.reject(request.user, reason='Adhérent existant déjà dans la base.')
+            messages.warning(request, 'La préinscription a été rejetée car un adhérent existe déjà avec ces informations.')
+        else:
+            try:
+                preinscription.approve(request.user)
+                messages.success(request, 'La préinscription a été validée et l’adhérent a été ajouté à la base.')
+            except ValidationError as e:
+                messages.error(request, e.message)
         return redirect('preinscription_list')
     return render(request, 'adherants/preinscription_approve.html', {'preinscription': preinscription})

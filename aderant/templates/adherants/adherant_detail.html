@@ -35,11 +35,14 @@
             <div class="card-body text-center">
                 <div class="position-relative d-inline-block mb-3">
                     {% if adherant.photo %}
-                    <img src="{{ adherant.photo.url }}" alt="Photo de {{ adherant.prenom }} {{ adherant.nom }}"
-                        class="rounded-circle profile-photo-lg border">
+                    <img id="adherantPhoto" src="{{ adherant.photo.url }}" alt="Photo de {{ adherant.prenom }} {{ adherant.nom }}"
+                        class="rounded-circle profile-photo-lg border"
+                        onerror="this.style.display='none'; document.getElementById('photoPlaceholder').style.display='flex';" />
+                    <div id="photoPlaceholder" class="rounded-circle profile-photo-lg border bg-light d-flex align-items-center justify-content-center" style="display:none;">
+                        <i class="fas fa-user text-muted fa-3x"></i>
+                    </div>
                     {% else %}
-                    <div
-                        class="rounded-circle profile-photo-lg border bg-light d-flex align-items-center justify-content-center">
+                    <div id="photoPlaceholder" class="rounded-circle profile-photo-lg border bg-light d-flex align-items-center justify-content-center">
                         <i class="fas fa-user text-muted fa-3x"></i>
                     </div>
                     {% endif %}
@@ -87,6 +90,21 @@
                         <small class="text-muted">Niveau étude</small>
                     </div>
                 </div>
+
+                <div class="row mt-3">
+                    <div class="col-12 text-start">
+                        <div class="d-flex flex-wrap align-items-center gap-2 justify-content-center">
+                            <span class="badge {% if adherant.situation == 'actif' %}bg-success{% else %}bg-secondary{% endif %} py-2 px-3">
+                                Statut : {{ adherant.situation|title }}
+                            </span>
+                            {% if competences_list %}
+                            <span class="badge bg-light text-dark py-2 px-3">
+                                Compétences : {{ competences_list|join:', ' }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -132,7 +150,7 @@
         </div>
 
         <!-- Competences -->
-        {% if adherant.competences %}
+        {% if competences_list %}
         <div class="card mt-4">
             <div class="card-header">
                 <h6 class="card-title mb-0">
@@ -143,7 +161,7 @@
             <div class="card-body">
                 <div class="competences-tags">
                     {% for competence in competences_list %}
-                    <span class="badge bg-light text-dark mb-2 me-1">{{ competences_list }}</span>
+                    <span class="badge bg-light text-dark mb-2 me-1">{{ competence }}</span>
                     {% endfor %}
                 </div>
             </div>
