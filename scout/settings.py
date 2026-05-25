@@ -37,14 +37,33 @@ DATABASE_URL='postgresql://mon_projet_scout_db_user:IHIfQPuHe42C7TG2eXJtVLBddKfM
 
 AUTH_USER_MODEL = 'aderant.CustomUser'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Ou votre serveur SMTP
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'abdoulnasserhanki@gmail.com'
-EMAIL_HOST_PASSWORD = 'hdpx koev aavs wcmv'
-DEFAULT_FROM_EMAIL = 'abdoulnasserhanki@gmail.com'
+# Email SMTP configuration using existing Gmail account
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_USE_SSL = False
+#EMAIL_TIMEOUT = 30
+#EMAIL_HOST_USER = 'abdoulnasserhanki@gmail.com'
+#EMAIL_HOST_PASSWORD = 'hdpx koev aavs wcmv'
+#DEFAULT_FROM_EMAIL = 'abdoulnasserhanki@gmail.com'
+#SERVER_EMAIL = DEFAULT_FROM_EMAIL
+#EMAIL_SUBJECT_PREFIX = '[Scout] '
 
+# Email via Brevo (port 2525, souvent ouvert sur Render)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('BREVO_EMAIL','')  # L'email de votre compte Brevo
+EMAIL_HOST_PASSWORD = os.environ.get('BREVO_API_KEY','')  # Votre clé API Brevo
+DEFAULT_FROM_EMAIL = 'abdoulnasserhanki@gmail.com'  # votre adresse Gmail vérifiée
+
+
+
+# Note: Render free bloque souvent les ports SMTP standards (25, 465, 587).
+# Si vous restez sur le plan gratuit, ce backend peut ne pas fonctionner à cause
+# de la politique d'infrastructure et non d'une erreur Django.
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accueil/'
