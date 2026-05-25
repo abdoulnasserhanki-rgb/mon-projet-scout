@@ -37,15 +37,6 @@ DATABASE_URL='postgresql://mon_projet_scout_db_user:IHIfQPuHe42C7TG2eXJtVLBddKfM
 
 AUTH_USER_MODEL = 'aderant.CustomUser'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Ou votre serveur SMTP
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'abdoulnasserhanki@gmail.com'
-EMAIL_HOST_PASSWORD = 'hdpx koev aavs wcmv'
-DEFAULT_FROM_EMAIL = 'abdoulnasserhanki@gmail.com'
-
-
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accueil/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
@@ -204,3 +195,27 @@ LOGGING = {
         },
     },
 }
+
+# --------------------------------------------------
+# Email configuration
+# Render bloque le trafic SMTP sortant sur l'offre gratuite.
+# Utiliser l'API SendGrid via django-anymail pour envoyer des emails.
+# Ne stockez jamais de clés secrètes en clair dans ce fichier.
+# --------------------------------------------------
+
+# Backend AnyMail (SendGrid)
+INSTALLED_APPS.insert(0, 'anymail')  # Ajoute anymail au début pour s'assurer qu'il est chargé
+
+ANYMAIL = {
+    'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
+}
+
+# Utiliser le backend AnyMail SendGrid
+EMAIL_BACKEND = 'anymail.backends.sendgrid.SendGridBackend'
+
+# Adresse d'envoi par défaut (modifiable via variable d'environnement)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'abdoulnasserhanki@gmail.com')
+
+# Remarque: l'ancienne configuration SMTP a été retirée car Render bloque
+# le trafic SMTP sortant sur les plans gratuits. Configurez `SENDGRID_API_KEY`
+# dans les variables d'environnement de votre service Render.
