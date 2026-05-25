@@ -315,6 +315,12 @@
                 <div class="row">
                    
                     <div class="col-md-4">
+                        <a href="{% url 'export_adherant_detail' adherant.id %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-download me-2"></i>
+                            Exporter CSV
+                        </a>
+                    </div>
+                    <div class="col-md-4">
                         <button class="btn btn-outline-success w-100 mb-2" onclick="printProfile()">
                             <i class="fas fa-print me-2"></i>
                             Imprimer

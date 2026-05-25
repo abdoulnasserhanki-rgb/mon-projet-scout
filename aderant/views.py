@@ -17,6 +17,8 @@ from .services import send_account_creation_email, send_password_reset_email
 from datetime import timedelta
 from datetime import date
 import logging
+import csv
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -451,7 +453,125 @@ def preinscription_list(request):
         return redirect('accueil')
     preinscriptions = Preinscription.objects.filter(status='PENDING')
     return render(request, 'adherants/preinscription_list.html', {'preinscriptions': preinscriptions})
+# ===== EXPORT VIEWS =====
 
+@login_required
+def export_adherants_csv(request):
+    """Exporte la liste complète des adhérents en CSV (ADMIN et CHEF_GROUPE uniquement)"""
+    if request.user.role not in ['ADMIN', 'CHEF_GROUPE']:
+        messages.error(request, "Accès réservé aux administrateurs et chefs de groupe.")
+        return redirect('adherant_list')
+    
+    adherants = Adherant.objects.all()
+    
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="adherants_export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Prénom', 'Nom', 'Date de naissance', 'Lieu de naissance', 
+                     'Sexe', 'Situation matrimoniale', 'Résidence', 'Niveau d\'étude',
+                     'Compétences', 'Unité', 'Situation', 'Motif d\'adhésion', 
+                     'Motivation', 'Religion', 'Numéro personnel', 'Numéro parent',
+                     'Date d\'intégration', 'Date de création'])
+    
+    for adherant in adherants:
+        writer.writerow([
+            adherant.prenom,
+            adherant.nom,
+            adherant.date_naissance.strftime('%d/%m/%Y') if adherant.date_naissance else '',
+            adherant.lieu_naissance,
+            adherant.get_sexe_display(),
+            adherant.get_situation_matrimoniale_display(),
+            adherant.residence,
+            adherant.niveau_etude,
+            adherant.competences if adherant.competences else '',
+            adherant.get_unite_display(),
+            adherant.get_situation_display(),
+            adherant.motif if adherant.motif else '',
+            adherant.motivation if adherant.motivation else '',
+            adherant.get_religion_display(),
+            adherant.numero if adherant.numero else '',
+            adherant.numero_parent if adherant.numero_parent else '',
+            adherant.date_integration.strftime('%d/%m/%Y') if adherant.date_integration else '',
+            adherant.date_creation.strftime('%d/%m/%Y') if adherant.date_creation else '',
+        ])
+    
+    messages.success(request, f'Export de {adherants.count()} adhérent(s) effectué avec succès.')
+    return response
+
+@login_required
+def export_adherant_detail_csv(request, adherant_id):
+    """Exporte les détails d'un adhérent en CSV"""
+    adherant = get_object_or_404(Adherant, id=adherant_id)
+    
+    user_role = request.user.role
+    user_unite = getattr(request.user, 'unite', None)
+    user_section = getattr(request.user, 'section', None)
+    can_view = False
+    
+    if user_role == 'ADMIN':
+        can_view = True
+    elif user_role == 'CHEF_GROUPE':
+        can_view = True
+    elif user_role == 'CHEF_UNITE' and user_unite and adherant.unite == user_unite:
+        can_view = True
+    elif user_role == 'CHEF_SECTION' and user_section and getattr(adherant, 'section', None) == user_section:
+        can_view = True
+    
+    if not can_view:
+        messages.error(request, "Accès non autorisé à cet adhérent.")
+        return redirect('adherant_list')
+    
+    age = calculer_age(adherant.date_naissance) if adherant.date_naissance else 0
+    branche = calculer_branche(age)
+    duree_adhesion = calculer_duree_adhesion(adherant.date_integration)
+    
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = f'attachment; filename="adherant_{adherant.prenom}_{adherant.nom}.csv"'
+    
+    writer = csv.writer(response)
+    
+    # En-tête avec le nom complet
+    writer.writerow([f'Détails - {adherant.prenom} {adherant.nom}'])
+    writer.writerow([])
+    
+    # Informations personnelles
+    writer.writerow(['INFORMATIONS PERSONNELLES'])
+    writer.writerow(['Prénom', adherant.prenom])
+    writer.writerow(['Nom', adherant.nom])
+    writer.writerow(['Date de naissance', adherant.date_naissance.strftime('%d/%m/%Y') if adherant.date_naissance else ''])
+    writer.writerow(['Lieu de naissance', adherant.lieu_naissance])
+    writer.writerow(['Sexe', adherant.get_sexe_display()])
+    writer.writerow(['Âge', age])
+    writer.writerow(['Situation matrimoniale', adherant.get_situation_matrimoniale_display()])
+    writer.writerow(['Niveau d\'étude', adherant.niveau_etude if adherant.niveau_etude else ''])
+    writer.writerow(['Religion', adherant.get_religion_display()])
+    writer.writerow([])
+    
+    # Informations scoutes
+    writer.writerow(['INFORMATIONS SCOUTES'])
+    writer.writerow(['Unité', adherant.get_unite_display()])
+    writer.writerow(['Branche', branche])
+    writer.writerow(['Situation', adherant.get_situation_display()])
+    writer.writerow(['Date d\'intégration', adherant.date_integration.strftime('%d/%m/%Y') if adherant.date_integration else ''])
+    writer.writerow(['Durée d\'adhésion (mois)', duree_adhesion])
+    writer.writerow(['Motif d\'adhésion', adherant.motif if adherant.motif else ''])
+    writer.writerow(['Motivation', adherant.motivation if adherant.motivation else ''])
+    writer.writerow([])
+    
+    # Contact et compétences
+    writer.writerow(['CONTACT ET COMPÉTENCES'])
+    writer.writerow(['Résidence', adherant.residence])
+    writer.writerow(['Numéro personnel', adherant.numero if adherant.numero else ''])
+    writer.writerow(['Numéro parent', adherant.numero_parent if adherant.numero_parent else ''])
+    writer.writerow(['Compétences', adherant.competences if adherant.competences else 'Aucune'])
+    writer.writerow([])
+    
+    # Dates
+    writer.writerow(['DATES SYSTÈME'])
+    writer.writerow(['Date de création', adherant.date_creation.strftime('%d/%m/%Y') if adherant.date_creation else ''])
+    
+    return response
 @login_required
 def preinscription_approve(request, preinscription_id):
     if request.user.role not in ['ADMIN', 'CHEF_GROUPE', 'CHEF_UNITE', 'CHEF_SECTION']:
