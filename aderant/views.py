@@ -456,6 +456,33 @@ def preinscription_list(request):
 # ===== EXPORT VIEWS =====
 
 @login_required
+def export_users_csv(request):
+    """Exporte la liste complète des utilisateurs en CSV (ADMIN et CHEF_GROUPE uniquement)"""
+    if request.user.role not in ['ADMIN', 'CHEF_GROUPE']:
+        messages.error(request, "Accès réservé aux administrateurs et chefs de groupe.")
+        return redirect('user_list')
+
+    users = CustomUser.objects.all().order_by('-date_joined')
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="utilisateurs_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Nom d\'utilisateur', 'Nom complet', 'Email', 'Rôle', 'Actif', 'Date de création', 'Dernière connexion'])
+
+    for user in users:
+        writer.writerow([
+            user.username,
+            user.get_full_name() or '',
+            user.email,
+            user.get_role_display() if hasattr(user, 'get_role_display') else user.role,
+            'Oui' if user.is_active else 'Non',
+            user.date_joined.strftime('%d/%m/%Y %H:%M') if user.date_joined else '',
+            user.last_login.strftime('%d/%m/%Y %H:%M') if user.last_login else '',
+        ])
+
+    return response
+
+@login_required
 def export_adherants_csv(request):
     """Exporte la liste complète des adhérents en CSV (ADMIN et CHEF_GROUPE uniquement)"""
     if request.user.role not in ['ADMIN', 'CHEF_GROUPE']:

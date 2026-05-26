@@ -70,11 +70,17 @@
                         <i class="fas fa-list me-2 text-primary"></i>
                         Liste des Utilisateurs ({{ users|length }})
                     </h5>
-                    <div class="input-group" style="max-width: 300px;">
-                        <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
-                        </span>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{% url 'export_users_all' %}" class="btn btn-info">
+                            <i class="fas fa-download me-2"></i>
+                            Exporter CSV
+                        </a>
+                        <div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

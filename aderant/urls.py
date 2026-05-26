@@ -14,6 +14,7 @@ urlpatterns = [
     path('users/<int:user_id>/edit/', views.user_edit, name='user_edit'),
     path('users/<int:user_id>/reset-password/', views.user_reset_password, name='user_reset_password'),
     path('users/<int:user_id>/toggle-active/', views.user_toggle_active, name='user_toggle_active'),
+    path('users/export/all/', views.export_users_csv, name='export_users_all'),
     # URLs de profil utilisateur
     path('profile/', views.user_profile, name='user_profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
