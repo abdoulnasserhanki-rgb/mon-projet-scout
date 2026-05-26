@@ -312,11 +312,11 @@
                 </h6>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row g-3">
                    
                     <div class="col-md-4">
                         <div class="d-grid gap-2">
-                            <a href="{% url 'export_adherant_detail' adherant.id %}" class="btn btn-outline-info w-100 mb-2">
+                            <a href="{% url 'export_adherant_detail' adherant.id %}" class="btn btn-outline-info w-100">
                                 <i class="fas fa-download me-2"></i>
                                 Exporter CSV
                             </a>
@@ -327,10 +327,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-outline-success w-100 mb-2" onclick="printProfile()">
-                            <i class="fas fa-print me-2"></i>
-                            Imprimer
-                        </button>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-success w-100" onclick="printProfile()">
+                                <i class="fas fa-print me-2"></i>
+                                Imprimer
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
