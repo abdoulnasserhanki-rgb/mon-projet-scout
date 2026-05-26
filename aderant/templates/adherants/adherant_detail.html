@@ -315,10 +315,16 @@
                 <div class="row">
                    
                     <div class="col-md-4">
-                        <a href="{% url 'export_adherant_detail' adherant.id %}" class="btn btn-outline-info w-100 mb-2">
-                            <i class="fas fa-download me-2"></i>
-                            Exporter CSV
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'export_adherant_detail' adherant.id %}" class="btn btn-outline-info w-100 mb-2">
+                                <i class="fas fa-download me-2"></i>
+                                Exporter CSV
+                            </a>
+                            <a href="{% url 'export_adherant_detail_pdf' adherant.id %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-file-pdf me-2"></i>
+                                Exporter PDF
+                            </a>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-outline-success w-100 mb-2" onclick="printProfile()">

@@ -19,6 +19,14 @@ from datetime import date
 import logging
 import csv
 from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -598,6 +606,140 @@ def export_adherant_detail_csv(request, adherant_id):
     writer.writerow(['DATES SYSTÈME'])
     writer.writerow(['Date de création', adherant.date_creation.strftime('%d/%m/%Y') if adherant.date_creation else ''])
     
+    return response
+
+@login_required
+def export_adherant_detail_pdf(request, adherant_id):
+    """Génère un PDF joli des détails d'un adhérent"""
+    adherant = get_object_or_404(Adherant, id=adherant_id)
+
+    # Vérification des droits (même logique que CSV)
+    user_role = request.user.role
+    user_unite = getattr(request.user, 'unite', None)
+    user_section = getattr(request.user, 'section', None)
+    can_view = False
+    if user_role == 'ADMIN' or user_role == 'CHEF_GROUPE':
+        can_view = True
+    elif user_role == 'CHEF_UNITE' and user_unite and adherant.unite == user_unite:
+        can_view = True
+    elif user_role == 'CHEF_SECTION' and user_section and getattr(adherant, 'section', None) == user_section:
+        can_view = True
+    if not can_view:
+        messages.error(request, "Accès non autorisé à cet adhérent.")
+        return redirect('adherant_list')
+
+    # Préparer le PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=80, bottomMargin=40)
+
+    # Register font for unicode (fallback to default on failure)
+    try:
+        font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+            base_font = 'DejaVuSans'
+        else:
+            base_font = 'Helvetica'
+    except Exception:
+        base_font = 'Helvetica'
+
+    styles = getSampleStyleSheet()
+    header_style = ParagraphStyle('Header', parent=styles['Heading1'], alignment=1, fontName=base_font, fontSize=16)
+    normal = ParagraphStyle('Normal', parent=styles['Normal'], fontName=base_font, fontSize=10)
+
+    elements = []
+    elements.append(Paragraph('Association Scout — Fiche Adhérent', header_style))
+    elements.append(Spacer(1, 8))
+    elements.append(Paragraph(f'<b>{adherant.prenom} {adherant.nom}</b>', styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    age = calculer_age(adherant.date_naissance) if adherant.date_naissance else ''
+    branche = calculer_branche(age) if age != '' else ''
+
+    data = [
+        ['Champ', 'Valeur'],
+        ['Prénom', adherant.prenom or ''],
+        ['Nom', adherant.nom or ''],
+        ['Date de naissance', adherant.date_naissance.strftime('%d/%m/%Y') if adherant.date_naissance else ''],
+        ['Lieu de naissance', adherant.lieu_naissance or ''],
+        ['Sexe', adherant.get_sexe_display() if hasattr(adherant, 'get_sexe_display') else adherant.sexe or ''],
+        ['Âge', str(age)],
+        ['Branche', branche],
+        ['Unité', adherant.get_unite_display() if hasattr(adherant, 'get_unite_display') else adherant.unite or ''],
+        ['Situation', adherant.get_situation_display() if hasattr(adherant, 'get_situation_display') else adherant.situation or ''],
+        ['Date d\'intégration', adherant.date_integration.strftime('%d/%m/%Y') if adherant.date_integration else ''],
+        ['Durée adhésion (mois)', calculer_duree_adhesion(adherant.date_integration)],
+        ['Compétences', adherant.competences or 'Aucune'],
+        ['Résidence', adherant.residence or ''],
+        ['Numéro personnel', adherant.numero or ''],
+        ['Numéro parent', adherant.numero_parent or ''],
+    ]
+
+    table = Table(data, colWidths=[140, 340])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f2f2f2')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#333333')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTNAME', (0, 0), (-1, -1), base_font),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="adherant_{adherant.prenom}_{adherant.nom}.pdf"'
+    response.write(pdf)
+    return response
+
+
+@login_required
+def export_adherants_pdf(request):
+    """Export PDF pour la liste des adhérents (tableau)"""
+    if request.user.role not in ['ADMIN', 'CHEF_GROUPE']:
+        messages.error(request, "Accès réservé aux administrateurs et chefs de groupe.")
+        return redirect('adherant_list')
+
+    adherants = Adherant.objects.all().order_by('nom')
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=80, bottomMargin=40)
+
+    try:
+        font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+            base_font = 'DejaVuSans'
+        else:
+            base_font = 'Helvetica'
+    except Exception:
+        base_font = 'Helvetica'
+
+    styles = getSampleStyleSheet()
+    header_style = ParagraphStyle('Header', parent=styles['Heading1'], alignment=1, fontName=base_font, fontSize=16)
+    elements = [Paragraph('Association Scout — Liste des Adhérents', header_style), Spacer(1, 12)]
+
+    data = [['Nom', 'Prénom', 'Date intégration', 'Unité', 'Branche']]
+    for a in adherants:
+        age = calculer_age(a.date_naissance) if a.date_naissance else ''
+        branche = calculer_branche(age) if age != '' else ''
+        data.append([a.nom or '', a.prenom or '', a.date_integration.strftime('%d/%m/%Y') if a.date_integration else '', a.get_unite_display() if hasattr(a, 'get_unite_display') else a.unite or '', branche])
+
+    table = Table(data, colWidths=[120, 120, 100, 80, 80])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e6f0ff')),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('FONTNAME', (0, 0), (-1, -1), base_font),
+    ]))
+    elements.append(table)
+    doc.build(elements)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="adherants_list.pdf"'
+    response.write(pdf)
     return response
 @login_required
 def preinscription_approve(request, preinscription_id):
