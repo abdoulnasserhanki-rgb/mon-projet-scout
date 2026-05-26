@@ -184,6 +184,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'  # URL de base pour accéder aux fichiers médias
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Chemin du système de fichiers où les fichiers sont stockés
 
+# ==========================================
+# IMGBB CONFIGURATION
+# ==========================================
+# Clé API ImgBB (définir dans Render ou votre environnement)
+IMGBB_API_KEY = os.environ.get('IMGBB_API_KEY', '')
+
+# Utiliser notre stockage ImgBB personnalisé en production
+# Par défaut Django utilisera le stockage local `MEDIA_ROOT` si cette variable
+# n'est pas définie ou si vous la remplacez par un stockage différent.
+DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE', 'aderant.storage.ImgBBStorage')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
