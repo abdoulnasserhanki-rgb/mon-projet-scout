@@ -765,3 +765,23 @@ def preinscription_approve(request, preinscription_id):
                 messages.error(request, e.message)
         return redirect('preinscription_list')
     return render(request, 'adherants/preinscription_approve.html', {'preinscription': preinscription})
+
+
+@login_required
+def preinscription_reject(request, preinscription_id):
+    if request.user.role not in ['ADMIN', 'CHEF_GROUPE', 'CHEF_UNITE', 'CHEF_SECTION']:
+        messages.error(request, "Accès réservé aux responsables.")
+        return redirect('accueil')
+
+    preinscription = get_object_or_404(Preinscription, id=preinscription_id, status='PENDING')
+
+    if request.method == 'POST':
+        reason = request.POST.get('rejected_reason', '').strip()
+        try:
+            preinscription.reject(request.user, reason=reason or None)
+            messages.success(request, 'La préinscription a été refusée.')
+        except ValidationError as e:
+            messages.error(request, e.message)
+        return redirect('preinscription_list')
+
+    return render(request, 'adherants/preinscription_reject.html', {'preinscription': preinscription})

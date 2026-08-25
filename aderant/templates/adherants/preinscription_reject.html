@@ -1,0 +1,59 @@
+{% extends 'dashbord.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 mb-2">
+                <i class="fas fa-times-circle me-2 text-danger"></i>
+                Refus de préinscription
+            </h1>
+            <p class="text-muted mb-0">Confirmez le refus de cette demande et ajoutez éventuellement une raison.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'preinscription_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Nom</dt>
+                    <dd class="col-sm-9">{{ preinscription.nom }}</dd>
+
+                    <dt class="col-sm-3">Prénom</dt>
+                    <dd class="col-sm-9">{{ preinscription.prenom }}</dd>
+
+                    <dt class="col-sm-3">Date de naissance</dt>
+                    <dd class="col-sm-9">{{ preinscription.date_naissance }}</dd>
+
+                    <dt class="col-sm-3">Unité</dt>
+                    <dd class="col-sm-9">{{ preinscription.unite }}</dd>
+
+                    <dt class="col-sm-3">Téléphone</dt>
+                    <dd class="col-sm-9">{{ preinscription.numero|default:'-' }}</dd>
+                </dl>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="rejected_reason" class="form-label">Motif du refus</label>
+                        <textarea name="rejected_reason" id="rejected_reason" rows="4" class="form-control" placeholder="Optionnel : expliquez pourquoi la préinscription est refusée."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger me-2">
+                        <i class="fas fa-times me-1"></i>Refuser la préinscription
+                    </button>
+                    <a href="{% url 'preinscription_list' %}" class="btn btn-secondary">
+                        Annuler
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

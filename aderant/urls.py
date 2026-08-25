@@ -30,4 +30,5 @@ urlpatterns = [
     path('preinscription/', views.preinscription_create, name='preinscription_create'),
     path('preinscription/pending/', views.preinscription_list, name='preinscription_list'),
     path('preinscription/<int:preinscription_id>/approve/', views.preinscription_approve, name='preinscription_approve'),
+    path('preinscription/<int:preinscription_id>/reject/', views.preinscription_reject, name='preinscription_reject'),
 ]

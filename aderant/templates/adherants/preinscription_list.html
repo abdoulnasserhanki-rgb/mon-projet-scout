@@ -46,12 +46,17 @@
                                 <td>{{ pre.numero|default:'-' }}</td>
                                 <td>{{ pre.created_at|date:'d/m/Y H:i' }}</td>
                                 <td>
-                                    <form method="post" action="{% url 'preinscription_approve' pre.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            <i class="fas fa-check me-1"></i>Valider
-                                        </button>
-                                    </form>
+                                    <div class="d-flex gap-2">
+                                        <form method="post" action="{% url 'preinscription_approve' pre.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check me-1"></i>Valider
+                                            </button>
+                                        </form>
+                                        <a href="{% url 'preinscription_reject' pre.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times me-1"></i>Refuser
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
